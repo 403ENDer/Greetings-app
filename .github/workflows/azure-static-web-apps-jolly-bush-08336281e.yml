@@ -15,19 +15,25 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4 # Update to use Node.js 20
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Remove extraheader from git config
+        run: |
+          git config --global --unset-all http.https://github.com/.extraheader || true
+      - name: Set Up Node.js 20.x
+        uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-      - name: Build And Deploy
+      - name: Install Dependencies
+        run: npm install
+      - name: Build and Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_BUSH_08336281E }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/" # App source code path
@@ -43,5 +49,5 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_BUSH_08336281E }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
